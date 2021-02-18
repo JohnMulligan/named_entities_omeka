@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+img {
+  width: 100%;
+  height: auto;
+}
+
+table {
+  border-collapse: collapse;
+  border: 3px solid purple;
+  table-layout: fixed;
+}
+
+tr, td {
+  border: 2px solid black;
+  vertical-align: bottom
+}
+</style>
+</head>
+<body>
+
+
+
+<form action="/write_entities" method="POST" id="my_form">
+<input type="hidden" name="jsonfile" id="jsonfile" value="{{jsonfile}}">
+<h2><p>keywords</p></h2>
+<table>
+<tbody>
+
+{% for item in items %}
+<tr class="keywords">
+<td style="width:150px">
+{{item.name}}
+</td>
+
+
+<td style="width:300px">
+
+<input type="checkbox" name="{{item.name}}__OMIT" id="{{item.name}}__OMIT" form="my_form">
+<label for="{{item.name}}__OMIT">OMIT</label><br/>
+<label for="{{item.name}}__class-select">CLASS:</label>
+<select name="{{item.name}}__class-select" id="{{item.name}}__class-select">
+<option value="">---</option>
+{% for class in classes %}
+<option value="{{class}}">{{class}}</option>
+{% endfor %}
+</select><br/>
+<label for="{{item.name}}__merge-into">MERGE INTO:</label>
+<select name="{{item.name}}__merge-into" id="{{item.name}}__merge-into">
+<option value="">---</option>
+{% for item in items %}
+<option value="{{item.name}}">{{item.name}}</option>
+{% endfor %}
+</select><br/>
+<label for="{{item.name}}__rename">RENAME TO:</label>
+<input type="text" id="{{item.name}}__rename" name="{{item.name}}__rename">
+
+
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<input type="submit">
+</form>
+</body>
+</html>
