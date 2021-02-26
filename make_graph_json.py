@@ -8,13 +8,7 @@ import pdf_to_txt
 import omeka_interfacer as O
 
 
-#notes=O.omeka_get('items',retrieve_all=True)
-
-d=open('tmp.json','r')
-t=d.read()
-items=json.loads(t)
-d.close()
-
+items=O.omeka_get('items',retrieve_all=True)
 
 nodes={}
 edges={}

@@ -32,10 +32,11 @@ def main(fn,jpg_dir='jpg_dir'):
 				print('bad page')
 	transcription=''
 	for i in os.listdir(jpg_dir):
+		print(i)
 		fp =os.path.join(jpg_dir,i)
 		t=pytesseract.image_to_string(Image.open(fp))
 		transcription+=t
-		print(t)
+		#print(t)
 		os.remove(fp)
 	os.rmdir(jpg_dir)
 	return transcription
