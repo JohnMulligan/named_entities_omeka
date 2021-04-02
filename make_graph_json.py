@@ -13,6 +13,10 @@ items=O.omeka_get('items',retrieve_all=True)
 nodes={}
 edges={}
 classes=[]
+
+
+
+
 for item in items:
 	label=item['o:title']
 	size=1

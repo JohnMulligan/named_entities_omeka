@@ -9,6 +9,8 @@ import omeka_interfacer as O
 import string
 
 
+autoconnect=True
+
 def get_ne(txt):
 	txt=re.sub('\n-','',txt)
 	txt=re.sub('-\n','',txt)
@@ -41,14 +43,12 @@ def get_ne(txt):
 	allmatches=[]
 	runningmatch=[]
 	c=0
-	while c<len(tokenized):
+	while c<len(tokenized) and len(tokenized) > 1:
 		breaker=False
 		try:
 			t=tokenized[c]
 		except:
 			break
-		
-		#print(t)
 		
 		if re.match(proper,t) and t not in known_baddies:
 			clean_t=re.sub(breaker_punctuation,'',t)
@@ -141,14 +141,15 @@ for m in pdfs:
 		open('temp.pdf','wb').write(response.content)
 		
 		try:
-			pdf=PdfFileReader('temp.pdf')
+			pdf=PdfFileReader('temp.pdf',strict=False)
+			numpages=pdf.numPages
 		except:
 			preprocess_pdf('temp.pdf')
-			pdf=PdfFileReader('temp.pdf')
+			pdf=PdfFileReader('temp.pdf',strict=False)
+			numpages=pdf.numPages
 		#print(dl)
 		c=0
 		
-		numpages=pdf.numPages
 		transcription=''
 		while c<numpages:
 			page=pdf.getPage(c)
@@ -166,26 +167,28 @@ for m in pdfs:
 		os.remove('temp.pdf')
 	else:
 		print('NOT A PDF. SKIPPING.')
+		transcription=None
 	#print(transcription)
 	
-	ne = get_ne(transcription)
+	if transcription !=None:
+		ne = get_ne(transcription)
 	
 	
-	print(ne)
-	#exit()
-	for n in ne:
-		if n not in pdf_named_entities:
-			pdf_named_entities[n]=[parent_id]
-		else:
-			pdf_named_entities[n].append(parent_id)
+		print(ne)
+		#exit()
+		for n in ne:
+			if n not in pdf_named_entities:
+				pdf_named_entities[n]=[parent_id]
+			else:
+				pdf_named_entities[n].append(parent_id)
 	
-	if os.path.exists('pdfs.json'):
-		d=open('pdfs.json','r')
-		t=d.read()
-		d.close()
-		j=json.loads(t)
-		for k in pdf_named_entities:
-			j[k]=pdf_named_entities[k]
+		if os.path.exists('pdfs.json'):
+			d=open('pdfs.json','r')
+			t=d.read()
+			d.close()
+			j=json.loads(t)
+			for k in pdf_named_entities:
+				j[k]=pdf_named_entities[k]
 d=open('pdfs.json','w')	
 t=d.write(json.dumps(pdf_named_entities))
 d.close()
@@ -196,11 +199,11 @@ notes=O.omeka_get('items',args_dict={'resource_class_id':resource_class_id},retr
 notes_named_entities={}
 for note in notes:
 	id=note['o:id']
-	if 'acm5air:note' not in note.keys():
+	if 'bibo:abstract' not in note.keys():
 		print("no text in note ", id)
 	else:
 		notes_text=''
-		for nt in note['acm5air:note']:
+		for nt in note['bibo:abstract']:
 			notes_text+=nt['@value']
 		ne=get_ne(notes_text)
 		
@@ -215,7 +218,7 @@ d=open('notes.json','w')
 t=d.write(json.dumps(notes_named_entities))
 d.close()
 
-threshold=1
+threshold=2
 
 combined=pdf_named_entities
 
@@ -230,8 +233,14 @@ for n in notes_named_entities:
 
 combined={i:combined[i] for i in combined if len(combined[i])>=threshold}
 
-d=open('threshold.json','w')
-d.write(json.dumps(combined))
-d.close()
+
+
+	
+	
+	
+else:
+	d=open('threshold.json','w')
+	d.write(json.dumps(combined))
+	d.close()
 
 

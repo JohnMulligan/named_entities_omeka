@@ -74,7 +74,6 @@ def write_entities(entities):
 			native_props={'o:resource_template':template_id}
 			self_omeka_id=O.create_item(rclass_props,native_properties=native_props,item_class=rclass_term)
 			#resource_class_id=O.omeka_get('resource_classes',{'term':rclass_term})[0]['o:id']
-	
 			'''#omeka privileges linking between items, not media
 			#if we're dealing with links back to media, map these to their parent items instead
 			if type=='media':
@@ -85,14 +84,12 @@ def write_entities(entities):
 					parent_item_ids.append(parent_item_id)
 				linked_ids=parent_item_ids'''
 			linked_ids=list(set(linked_ids))
-	
 			print(linked_ids)
-	
 			for linked_item_id in linked_ids:
 				linked_item_properties=[{'term':'dcterms:references','type':'resource','value':self_omeka_id}]
 				self_properties=[{'term':'dcterms:isReferencedBy','type':'resource','value':linked_item_id}]
-				O.update_item(self_properties,self_omeka_id)
-				O.update_item(linked_item_properties,linked_item_id)
+				O.update_item(self_properties,self_omeka_id,keep_nonlinks=True,keep_links=True)
+				O.update_item(linked_item_properties,linked_item_id,keep_nonlinks=True,keep_links=True)
 		except:
 			print('error with',title,entities[title])
 
